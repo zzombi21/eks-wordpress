@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: wordpress-service
+  labels:
+    app: wordpress
+spec:
+  ports:
+    - port: 80
+  type: NodePort
+  selector:
+    app: wordpress
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wordpress-deployment
+  labels:
+    app: wordpress
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wordpress
+  template:
+    metadata:
+      labels:
+        app: wordpress
+    spec:
+      containers:
+        - image: wordpress:5.3-apache
+          name: wordpress
+          resources:
+            requests:
+              memory: 256Mi
+              cpu: 250m
+            limits:
+              memory: 512Mi
+              cpu: 500m
+          env:
+            - name: WORDPRESS_DB_HOST
+              value: mysql
+            - name: WORDPRESS_DB_PASSWORD
+              value: ""  
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: wordpress-efs-uploads
+              mountPath: /var/www/html/
+      volumes:
+        - name: wordpress-efs-uploads
+          persistentVolumeClaim:
+            claimName: wordpress-efs-uploads-pvc

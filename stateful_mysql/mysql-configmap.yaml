@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-config
+  namespace: wordpress
+  labels:
+    app: mysql
+data:
+  master.cnf: |
+    [mysqld]
+    log-bin
+    skip-host-cache
+    skip-name-resolve
+  slave.cnf: |
+    [mysqld]
+    skip-host-cache
+    skip-name-resolve
